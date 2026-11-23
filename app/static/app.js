@@ -141,7 +141,7 @@
     $('#app').innerHTML = `
       <div class="workspace">
         <aside class="sidebar">
-          <div class="brand">AMS 警報管理</div>
+          <div class="brand"><span class="brand-mark"></span><span class="brand-word">AMS 警報管理</span></div>
           <nav class="menu" id="sidebar-menu"></nav>
         </aside>
         <div class="main">
@@ -190,6 +190,11 @@
     if (!sidebar) return;
     sidebar.innerHTML = html;
   }
+
+  const REF_LABELS = {
+    FACTORY_KEY: '廠別', SUB_SYS_KEY: '子系統', EQP_KEY: '機台', EVENT_KEY: '通知事件',
+    EVENT_GROUP_KEY: '事件通知人員群組', USER_KEY: '使用者', ALARM_INFO_KEY: '警報代碼',
+  };
 
   const ROUTE_TITLES = {
     '/event-groups': ['事件通知人員群組設定', 'AVMA006'],
@@ -254,22 +259,10 @@
     return map;
   }
 
-  function renderColumns(page, rows, choices = {}) {
-    const columns = page.columns || Object.keys(rows[0] || {}).filter(k => !k.endsWith('_KEY'));
-    return columns.map(col => {
-      const sample = rows[0]?.[col];
-      if (sample && choices[col]?.resource) {
-        const displayField = choices[col].display;
-        return `<th>${esc(col)}</th>`;
-      }
-      return `<th>${esc(col)}</th>`;
-    }).join('');
-  }
-
   function renderNormalRows(page, rows, choices = {}, selectedKey = '') {
     const columns = page.columns || Object.keys(rows[0] || {}).filter(k => !k.endsWith('_KEY'));
     if (!rows.length) return '<div class="empty">沒有資料</div>';
-    const heads = columns.map(c => `<th>${esc(c)}</th>`).join('');
+    const heads = columns.map(c => `<th>${esc((page.fields || []).find(f => f.name === c)?.label || REF_LABELS[c] || c)}</th>`).join('');
     const body = rows.map(row => {
       const key = row[primaryKey(row)];
       const tds = columns.map(col => {

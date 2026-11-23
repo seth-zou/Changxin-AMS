@@ -492,8 +492,8 @@ def seed_demo_data(conn: sqlite3.Connection) -> None:
             ("USER_ADMIN", demo_id, "系統管理者", "admin@example.com", "", "", "",
              "Y", password_hash, salt, utcnow(), "SYSTEM"),
         )
-    # Shared send-type catalog represented as read-only rows in service config metadata.
-    if conn.execute("SELECT 1 FROM FUNCTION_MENU WHERE FUNCTION_ID='SYSTEM'").fetchone() is None:
+    # Menu rows are upserted by stable key so new restoration pages appear in an existing database.
+    if True:
         for row in [
             ("SYSTEM", None, "SYSTEM", "系統設定", "系統功能選單設定", "/system-functions", 10),
             ("BASIC", None, "BASIC", "基本設定", "主檔與對應設定", "", 20),
@@ -535,9 +535,13 @@ def seed_demo_data(conn: sqlite3.Connection) -> None:
             conn.execute(
                 """INSERT OR IGNORE INTO FUNCTION_MENU
                 (FUNCTION_KEY, PARENT_KEY, FUNCTION_ID, FUNCTION_NAME, FUNCTION_DESC, PATH_NAME, DISPLAY_SEQ, UPDATED_AT, UPDATED_BY)
-                VALUES (?,?,?,?,?,?,?,?,?)""",
+                VALUES (?,?,?,?,?,?,?,?,?)
+                ON CONFLICT(FUNCTION_KEY) DO UPDATE SET
+                  PARENT_KEY=excluded.PARENT_KEY, FUNCTION_NAME=excluded.FUNCTION_NAME,
+                  FUNCTION_DESC=excluded.FUNCTION_DESC, PATH_NAME=excluded.PATH_NAME,
+                  DISPLAY_SEQ=excluded.DISPLAY_SEQ""",
                 (row[0], row[1], row[2], row[3], row[4], row[5], row[6], utcnow(), "SYSTEM"),
-            )
+)
     # Minimal device catalog used by the device report and service-config page.
     for server, agent, device, enable in [
         ("AMS01", "AgentEmail", "Email01", "Y"),

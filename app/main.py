@@ -275,6 +275,16 @@ def list_resource(
     return [row_dict(r) for r in rows]
 
 
+@app.get("/api/resources/{resource}/options")
+def resource_options(resource: str, user: dict[str, Any] = Depends(require_user), conn: Any = Depends(db_conn)) -> list[dict[str, Any]]:
+    meta = _resource_or_404(resource)
+    display_field = meta.get("unique") or next((f for f in meta["fields"] if f not in (meta["pk"], "ACTIVE")), meta["pk"])
+    cols = table_columns(conn, meta["table"])
+    where = " WHERE ACTIVE='Y'" if "ACTIVE" in cols else ""
+    rows = conn.execute(f'SELECT "{meta["pk"]}" AS KEY, "{display_field}" AS LABEL FROM "{meta["table"]}"{where} ORDER BY "{display_field}"').fetchall()
+    return [{"KEY": r["KEY"], "LABEL": r["LABEL"]} for r in rows]
+
+
 @app.get("/api/resources/{resource}/{record_key}")
 def get_resource(resource: str, record_key: str, user: dict[str, Any] = Depends(require_user), conn: Any = Depends(db_conn)) -> dict[str, Any]:
     meta = _resource_or_404(resource)

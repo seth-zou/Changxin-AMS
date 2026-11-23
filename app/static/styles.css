@@ -89,3 +89,11 @@ label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px
 .tabbar button { border: 0; border-bottom: 2px solid transparent; background: transparent; color: var(--muted); }
 .tabbar button.active { color: var(--blue); border-bottom-color: var(--blue); font-weight: 650; }
 .footer { padding: 8px 18px; font-size: 11px; color: var(--muted); border-top: 1px solid var(--border); background: #fff; }
+
+
+/* Delta-inspired brand treatment: blue delta shape + green accent from source deck. */
+.brand { display: flex; align-items: center; gap: 10px; }
+.brand-mark { width: 28px; height: 28px; display: inline-block; clip-path: polygon(50% 0, 100% 100%, 0 100%); background: var(--green); flex: 0 0 auto; }
+.brand-word { font-size: 17px; letter-spacing: .5px; }
+.login-card::before { content: ""; display: block; width: 64px; height: 8px; border-radius: 8px; background: linear-gradient(90deg, var(--blue) 0 55%, var(--green) 55% 100%); margin-bottom: 18px; }
+.login-card { border-top: 5px solid var(--blue); }
