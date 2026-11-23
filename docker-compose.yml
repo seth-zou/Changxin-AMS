@@ -1,0 +1,12 @@
+services:
+  ams:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      AMS_ADMIN_PASSWORD: "${AMS_ADMIN_PASSWORD:?set AMS_ADMIN_PASSWORD before starting}"
+    volumes:
+      - ams-data:/app/data
+    restart: unless-stopped
+volumes:
+  ams-data:
